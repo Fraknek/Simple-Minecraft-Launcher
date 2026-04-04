@@ -7,12 +7,35 @@ import json
 import psutil
 import tkinter.messagebox as messagebox
 import requests
+import time
+
+splash = customtkinter.CTk()
+#splash.geometry("300x200")
+splash.overrideredirect(True)
+width = 300
+height = 200
+splash.overrideredirect(True)
+splash.attributes("-alpha", 0.9)
+screen_width = splash.winfo_screenwidth()
+screen_height = splash.winfo_screenheight()
+x = int((screen_width / 2) - (width / 2))
+y = int((screen_height / 2) - (height / 2))
+splash.geometry(f"{width}x{height}+{x}+{y}")
+splash.title("Minecraft Launcher")
+
+label = customtkinter.CTkLabel(splash, text="Simple Minecraft Launcher is\nLoading...", font=("Arial", 20))
+label.pack(expand=True)
+splash.update()
+time.sleep(3)
+splash.destroy()
+
+#now main
 
 APP_VERSION = "1.0"
 customtkinter.set_appearance_mode("dark")
 customtkinter.set_default_color_theme("dark-blue")
 root = customtkinter.CTk()
-root.attributes("-alpha", 0.97)
+root.attributes("-alpha", 0.9)
 
 width = 500
 height = 550
@@ -92,7 +115,7 @@ def is_installed(version):
 def is_minecraft_running():
     for proc in psutil.process_iter(['name', 'cmdline']):
         try:
-            if proc.info['name'] == "java.exe":
+            if proc.info['name'] == "javaw.exe":
                 cmdline = " ".join(proc.info.get('cmdline', []))
                 if "minecraft" in cmdline.lower():
                     return True
@@ -149,7 +172,8 @@ def download_and_run():
 
     options = {"username": nick if nick else "Player",
                "uuid": "1234567890abcdef1234567890abcdef",
-               "token": "tungsahur"}
+               "token": "tungsahur",
+               "executablePath": "javaw"}
     command = minecraft_launcher_lib.command.get_minecraft_command(version, mc_dir, options)
     process = subprocess.Popen(command)
 
