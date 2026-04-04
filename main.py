@@ -6,8 +6,9 @@ import threading
 import json
 import psutil
 import tkinter.messagebox as messagebox
+import requests
 
-
+APP_VERSION = "1.0"
 customtkinter.set_appearance_mode("dark")
 customtkinter.set_default_color_theme("dark-blue")
 root = customtkinter.CTk()
@@ -28,6 +29,22 @@ y_offset = 0
 CONFIG_FILE = "config.json"
 mc_dir = os.path.join(os.getcwd(), ".minecraft")
 
+def check_for_updates():
+    try:
+        url = "https://raw.githubusercontent.com/Fraknek/Simple-Minecraft-Launcher/refs/heads/main/newversion.json"
+        response = requests.get(url, timeout=5)
+        data = response.json()
+
+        latest_version = data["version"]
+
+        if latest_version != APP_VERSION:
+            root.after(0, lambda: messagebox.showinfo(
+                "Update",
+                f"New Version available!\nYour: {APP_VERSION}\nNewest: {latest_version}"
+            ))
+
+    except Exception as e:
+        print("Error in checking for update:", e)
 
 def start_move(event):
     global x_offset, y_offset
@@ -153,7 +170,7 @@ subtitle.place(y=50, x=350)
 customtkinter.CTkLabel(main_frame, text="Nick", font=("Arial", 20)).pack()
 nick_entry = customtkinter.CTkEntry(main_frame, width=250, height=40, corner_radius=15, placeholder_text="Default nick is Player")
 nick_entry.pack(pady=10)
-versionlabel = customtkinter.CTkLabel(main_frame, text="Version: 1.0", font=("Arial", 13,))
+versionlabel = customtkinter.CTkLabel(main_frame, text=APP_VERSION, font=("Arial", 13,))
 versionlabel.place(y=480, x=10)
 predefined_versions = [
     "1.8.9","1.9","1.9.4","1.10.2","1.11","1.11.2","1.12","1.12.1","1.12.2",
@@ -198,5 +215,5 @@ load_config()
 update_button()
 check_mods_button()
 check_openmcdir_button()
-
+threading.Thread(target=check_for_updates, daemon=True).start()
 root.mainloop()
